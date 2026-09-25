@@ -4,8 +4,8 @@ import com.progect.editor.dto.PdfCustomCutRequest;
 import com.progect.editor.dto.PdfCutRequest;
 import com.progect.editor.exception.EmptyFileException;
 import com.progect.editor.exception.InvalidPageRangeException;
-import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,8 +27,9 @@ public class PdfService {
             throw new EmptyFileException("The file must not be empty");
         }
 
+        // تحويل الـ MultipartFile إلى RandomAccessReadBuffer المتوافق مع PDFBox 3.x
         try (InputStream inputStream = file.getInputStream();
-             PDDocument pdf = Loader.loadPDF(inputStream, MemoryUsageSetting.setupTempFileOnly())) {
+             PDDocument pdf = Loader.loadPDF(new RandomAccessReadBuffer(inputStream))) {
 
             int startPage = pdfCutRequest.getFromPage();
             int endPage = pdfCutRequest.getToPage();
@@ -40,7 +41,7 @@ public class PdfService {
                 );
             }
 
-            try (PDDocument newDoc = new PDDocument(MemoryUsageSetting.setupTempFileOnly());
+            try (PDDocument newDoc = new PDDocument();
                  ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
                 for (int i = startPage - 1; i < endPage; i++) {
@@ -64,12 +65,12 @@ public class PdfService {
         }
 
         try (InputStream inputStream = file.getInputStream();
-             PDDocument pdf = Loader.loadPDF(inputStream, MemoryUsageSetting.setupTempFileOnly())) {
+             PDDocument pdf = Loader.loadPDF(new RandomAccessReadBuffer(inputStream))) {
 
             int totalPages = pdf.getNumberOfPages();
             Set<Integer> targetPages = parsePageRanges(request.getPages(), totalPages);
 
-            try (PDDocument newDoc = new PDDocument(MemoryUsageSetting.setupTempFileOnly());
+            try (PDDocument newDoc = new PDDocument();
                  ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
                 for (int pageNum : targetPages) {
