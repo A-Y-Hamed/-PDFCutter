@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>قص PDF مخصص | استخراج صفحات محددة أونلاين</title>
+    <meta name="description" content="أداة استخراج وصفحات PDF مخصصة. قم بتحديد أرقام ونطاقات الصفحات المطلوبة (مثال: 1-3, 5, 8-10) واستخرجها بسرعة وبأعلى جودة.">
+    <meta name="keywords" content="قص pdf مخصص, استخراج صفحات pdf, تقسيم pdf, pdf custom split, فصل صفحات pdf">
+
+    <meta property="og:title" content="قص ملفات PDF المخصص أونلاين">
+    <meta property="og:description" content="أداة سريعة لاستخراج صفحات محددة من ملفات الـ PDF بسهولة.">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/x-icon" href="/pdf3.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { font-family: 'Tajawal', sans-serif; }
+        .bg-glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /*.drag-active {*/
+        /*    border-color: #6366f1 !important;*/
+        /*    background-color: rgba(99, 102, 241, 0.1) !important;*/
+        /*}*/
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white antialiased">
+
+<header class="w-full border-b border-slate-800 bg-slate-900/80 backdrop-blur-lg fixed top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+
+        <div class="flex items-center gap-2.5 sm:gap-3">
+            <a href="/" class="flex items-center gap-2.5 sm:gap-3 group">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-rose-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <span class="text-lg sm:text-xl font-extrabold tracking-wide bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">PDF<span class="text-indigo-500">Cutter</span></span>
+            </a>
+        </div>
+
+        <div class="flex items-center gap-3 sm:gap-4">
+
+            <a href="/home" class="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all duration-300 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 flex items-center gap-1.5 sm:gap-2 active:scale-95">
+                <i class="fa-solid fa-sliders text-[10px] sm:text-xs"></i>
+                <span>قص حسب النطاق (من - إلى)</span>
+            </a>
+
+            <span class="hidden md:flex text-xs px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> السيرفر متصل
+            </span>
+
+        </div>
+    </div>
+</header>
+
+<!-- Main Container -->
+<main class="flex-1 flex items-center justify-center px-4 pt-24 sm:pt-28 pb-8 sm:pb-12">
+    <div class="w-full max-w-xl bg-glass rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl shadow-slate-950/80 space-y-5 sm:space-y-6 relative overflow-hidden">
+
+        <div class="absolute -top-24 -right-24 w-40 sm:w-48 h-40 sm:h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-40 sm:w-48 h-40 sm:h-48 bg-rose-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="text-center space-y-1.5 sm:space-y-2">
+            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">استخراج صفحات PDF مخصصة</h1>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">أدخل أرقام الصفحات والنطاقات بشكل مخصص واستخرجها بدقة</p>
+        </div>
+
+        <div id="dropZone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/60 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center transition-all duration-300 cursor-pointer bg-slate-900/40 relative group">
+            <input type="file" id="fileInput" accept=".pdf" class="hidden">
+
+            <div id="uploadIdle" class="space-y-3 sm:space-y-4">
+                <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-xl sm:rounded-2xl bg-slate-800/80 group-hover:bg-indigo-600/20 group-hover:text-indigo-400 text-slate-400 flex items-center justify-center text-xl sm:text-2xl transition-all duration-300 border border-slate-700 group-hover:border-indigo-500/30">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div>
+                    <p class="text-slate-200 font-semibold text-sm sm:text-base">اسحب ملف الـ PDF هنا أو <span class="text-indigo-400 hover:underline">تصفح جهازك</span></p>
+                    <p class="text-slate-500 text-[11px] sm:text-xs mt-1">يدعم ملفات PDF حتى حجم 150 ميجابايت</p>
+                </div>
+            </div>
+
+            <div id="uploadActive" class="hidden flex items-center justify-between p-3 bg-slate-800/80 rounded-xl border border-slate-700">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-file-pdf text-base sm:text-lg"></i>
+                    </div>
+                    <div class="text-right truncate">
+                        <p id="fileName" class="text-xs sm:text-sm font-medium text-slate-200 truncate">document.pdf</p>
+                        <p id="fileSize" class="text-[10px] sm:text-xs text-slate-400">2.4 MB</p>
+                    </div>
+                </div>
+                <button type="button" id="removeFileBtn" class="p-2 text-slate-400 hover:text-rose-400 transition-colors">
+                    <i class="fa-solid fa-xmark text-base sm:text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <form id="cutForm" class="space-y-5 sm:space-y-6">
+            <div class="space-y-1.5 sm:space-y-2">
+                <label for="pageRanges" class="block text-[11px] sm:text-xs font-semibold text-slate-300 uppercase tracking-wider">الصفحات المطلوبة</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 right-0 pl-3 pr-3 flex items-center text-slate-500 pointer-events-none">
+                        <i class="fa-solid fa-list-ol text-xs"></i>
+                    </span>
+                    <input type="text" id="pageRanges" placeholder="مثال: 1-3, 5, 8-10" required class="w-full bg-slate-900/80 border border-slate-700 rounded-xl py-2.5 sm:py-3 pr-9 pl-4 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm font-medium">
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1">استخدم الفواصل للأرقام الفردية والنشرطة المائلة للنطاقات (مثل: 1, 3-5, 9).</p>
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full py-3.5 sm:py-4 px-6 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-sm sm:text-base font-bold rounded-xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all duration-300 flex items-center justify-center gap-2.5 sm:gap-3 group active:scale-[0.99]">
+                <i class="fa-solid fa-scissors group-hover:rotate-45 transition-transform duration-300"></i>
+                <span>قص الملف وتحميله</span>
+            </button>
+        </form>
+
+        <div id="progressContainer" class="hidden space-y-2.5 sm:space-y-3">
+            <div class="flex justify-between text-xs text-slate-400 font-medium">
+                <span>جاري معالجة الملف...</span>
+                <span id="progressText">0%</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div id="progressBar" class="h-full bg-gradient-to-r from-indigo-500 to-rose-500 w-0 transition-all duration-300"></div>
+            </div>
+        </div>
+
+        <div id="alertBox" class="hidden p-3.5 sm:p-4 rounded-xl text-xs sm:text-sm font-medium flex items-center gap-3"></div>
+
+    </div>
+</main>
+
+<footer class="w-full py-4 sm:py-6 text-center text-[11px] sm:text-xs text-slate-500 border-t border-slate-900 px-4">
+    تطوير وتصميم متكامل بمساعدة Spring Boot & Tailwind CSS &copy; 2026
+</footer>
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const uploadIdle = document.getElementById('uploadIdle');
+    const uploadActive = document.getElementById('uploadActive');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+    const cutForm = document.getElementById('cutForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const alertBox = document.getElementById('alertBox');
+
+    let selectedFile = null;
+
+    dropZone.addEventListener('click', (e) => {
+        if (e.target !== removeFileBtn && !removeFileBtn.contains(e.target)) {
+            fileInput.click();
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
+
+    ['dragenter', 'dragover'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-active');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-active');
+        }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type === "application/pdf") {
+            handleFile(files[0]);
+        } else {
+            showAlert('الرجاء رفع ملف بصيغة PDF فقط!', 'error');
+        }
+    });
+
+    function handleFile(file) {
+        if (file.type !== "application/pdf") {
+            showAlert('يرجى تحديد ملف PDF صالح', 'error');
+            return;
+        }
+        selectedFile = file;
+        fileName.textContent = file.name;
+        fileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+        uploadIdle.classList.add('hidden');
+        uploadActive.classList.remove('hidden');
+        hideAlert();
+    }
+
+    removeFileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedFile = null;
+        fileInput.value = '';
+        uploadActive.classList.add('hidden');
+        uploadIdle.classList.remove('hidden');
+    });
+
+    cutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!selectedFile) {
+            showAlert('يرجى اختيار ملف PDF أولاً!', 'error');
+            return;
+        }
+
+        const pageRanges = document.getElementById('pageRanges').value.trim();
+
+        if (!pageRanges) {
+            showAlert('يرجى إدخال أرقام الصفحات المطلوبة!', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('pages', pageRanges);
+
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        progressContainer.classList.remove('hidden');
+        hideAlert();
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            if (progress < 90) {
+                progress += 10;
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
+            }
+        }, 100);
+
+        try {
+            const response = await fetch('/api/pdf/cut-custom', {
+                method: 'POST',
+                body: formData
+            });
+
+            clearInterval(interval);
+
+            if (response.ok) {
+                progressBar.style.width = '100%';
+                progressText.textContent = '100%';
+
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `cut_${selectedFile.name}`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+
+                showAlert('تم قص الملف وتحميله بنجاح!', 'success');
+            } else {
+                showAlert('حدث خطأ في السيرفر أثناء معالجة الملف', 'error');
+            }
+        } catch (err) {
+            clearInterval(interval);
+            console.error(err);
+            showAlert('تعذر الاتصال بالسيرفر، تأكد من تشغيل Spring Boot', 'error');
+        } finally {
+            setTimeout(() => {
+                progressContainer.classList.add('hidden');
+                progressBar.style.width = '0%';
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }, 1000);
+        }
+    });
+
+    function showAlert(message, type) {
+        alertBox.classList.remove('hidden', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/20', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
+        alertBox.classList.add('border');
+
+        if (type === 'error') {
+            alertBox.classList.add('bg-rose-500/10', 'text-rose-400', 'border-rose-500/20');
+            alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation text-base sm:text-lg"></i> <span>${message}</span>`;
+        } else {
+            alertBox.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
+            alertBox.innerHTML = `<i class="fa-solid fa-circle-check text-base sm:text-lg"></i> <span>${message}</span>`;
+        }
+    }
+
+    function hideAlert() {
+        alertBox.classList.add('hidden');
+    }
+</script>
+</body>
+</html>
